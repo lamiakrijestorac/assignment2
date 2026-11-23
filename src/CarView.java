@@ -1,9 +1,6 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * This class represents the full view of the MVC pattern of your car simulator.
@@ -18,9 +15,9 @@ public class CarView extends JFrame {
     public static final int Y = 800;
 
     // The controller member
-    CarController carC;
+    CarController carController;
 
-    DrawPanel drawPanel = new DrawPanel(X, Y-240);
+    DrawPanel drawPanel;
 
     JPanel controlPanel = new JPanel();
 
@@ -40,8 +37,15 @@ public class CarView extends JFrame {
     JButton stopButton = new JButton("Stop all cars");
 
     // Constructor
-    public CarView(String framename, CarController cc) {
-        this.carC = cc;
+    public CarView(String framename, CarController cc)
+    {
+        this.carController = cc;
+        ArrayList<CarViewInfo> carViewInfoArrayList = new ArrayList<>();
+        for (Car car : this.carController.cars)
+        {
+            carViewInfoArrayList.add(new CarViewInfo(car.getUniqID(), new Point((int) car.getX(), (int)car.getY()), car.getImagePath()));
+        }
+        drawPanel = new DrawPanel(X, Y-240, carViewInfoArrayList);
         initComponents(framename);
     }
 
@@ -95,9 +99,38 @@ public class CarView extends JFrame {
 
         // This actionListener is for the gas button only
         // TODO: Create more for each component as necessary
-        gasButton.addActionListener(e -> {
-            carC.gas(gasAmount);
+        gasButton.addActionListener(e ->
+        {
+            carController.gas(gasAmount);
         });
+
+        brakeButton.addActionListener( e -> {
+            carController.brake(10);
+        });
+
+        leftButton.addActionListener(e -> {
+            carController.turnLeft();
+        });
+
+        rightButton.addActionListener(e-> {
+            carController.turnRight();
+        } );
+
+        startButton.addActionListener(e-> {
+            carController.startTimer();
+        } );
+
+        stopButton.addActionListener(e-> {
+            carController.stopTimer();
+        } );
+
+        turboOnButton.addActionListener(e-> {
+            carController.setTurboOn();
+        } );
+
+        turboOffButton.addActionListener(e-> {
+            carController.setTurboOff();
+        } );
 
         // Make the panel layout more compact
         this.pack();
